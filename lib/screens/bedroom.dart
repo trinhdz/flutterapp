@@ -148,7 +148,7 @@ class Bedroom extends StatelessWidget {
             ),
           ),
 
-          // Rectangle LED 2 (chưa thêm switch/ảnh)
+          // LED 2 
           Positioned(
             left: 207,
             top: 171,
@@ -226,7 +226,7 @@ class Bedroom extends StatelessWidget {
               },
             ),
           ),
-
+          // FanFan
           Positioned(
             left: 28,
             top: 370,
@@ -304,7 +304,7 @@ class Bedroom extends StatelessWidget {
               },
             ),
           ),
-
+          // airair
           Positioned(
             left: 207,
             top: 370,
@@ -333,7 +333,7 @@ class Bedroom extends StatelessWidget {
                           ),
                           alignment: Alignment.center,
                           child: const Text(
-                            "Fan",
+                            "Air",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -382,7 +382,7 @@ class Bedroom extends StatelessWidget {
               },
             ),
           ),
-          // Text Sensors
+          // Sensors
           const Positioned(
             left: 37,
             top: 580,
@@ -395,7 +395,7 @@ class Bedroom extends StatelessWidget {
               ),
             ),
           ),
-          // Rectangle Temp
+          // Temp
           Positioned(
             left: 32,
             top: 620,
@@ -461,7 +461,7 @@ class Bedroom extends StatelessWidget {
               ),
             ),
           ),
-
+         //humhum
           Positioned(
             left: 32,
             top: 730,
