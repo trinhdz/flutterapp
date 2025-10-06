@@ -1,24 +1,29 @@
-import 'package:cuoiki/screens/registerpage.dart';
-import 'package:flutter/material.dart';
 import 'package:cuoiki/screens/homepage.dart';
+import 'package:cuoiki/screens/loginpage.dart';
+import 'package:flutter/material.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
+    double widthScale = screenWidth / 412;
+    double heightScale = screenHeight / 917; 
     return Scaffold(
       body: Stack(
         children: [
-          // Chữ Welcome
           Positioned(
-            left: screenWidth * 0.33,
-            top: screenHeight * 0.15,
+            left: widthScale * 85,
+            top: heightScale * 202,
             child: const Text(
-              "Welcome",
+              "Creat Account",
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 35,
@@ -26,8 +31,6 @@ class LoginPage extends StatelessWidget {
               ),
             ),
           ),
-
-          // Các hình tròn trang trí
           Positioned(
             left: screenWidth * 0.12,
             top: screenHeight * 0.05,
@@ -69,21 +72,21 @@ class LoginPage extends StatelessWidget {
             ),
           ),
 
-          // Hình ảnh nền
+
           Positioned(
-            left: screenWidth * 0.15,
-            top: screenHeight * 0.22,
-            child: Image.asset(
-              'assets/decorate/backgr.png',
-              width: screenWidth * 0.75,
-              height: screenWidth * 0.75,
+            left: widthScale * 36,
+            top: heightScale * 295,
+            child: const Text(
+              "Username",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+              ),
             ),
           ),
-
-          // Ô nhập Email
           Positioned(
-            left: screenWidth * 0.1,
-            top: screenHeight * 0.56,
+            left: widthScale * 36,
+            top: heightScale * 322,
             child: Container(
               width: screenWidth * 0.85,
               height: 50,
@@ -95,6 +98,42 @@ class LoginPage extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 8),
                 child: TextField(
                   decoration: InputDecoration(
+                    hintText: "Username",
+                    prefixIcon: Icon(Icons.person),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 13),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          Positioned(
+            left: widthScale * 36,
+            top: heightScale * 402,
+            child: const Text(
+              "Email",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+              ),
+            ),
+          ),
+          Positioned(
+            left: widthScale * 36,
+            top: heightScale * 430,
+            child: Container(
+              width: screenWidth * 0.85,
+              height: 50,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: const Color(0xFFF2F0F0),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: TextField(
+                  obscureText: true,
+                  decoration: InputDecoration(
                     hintText: "Email",
                     prefixIcon: Icon(Icons.email),
                     border: InputBorder.none,
@@ -105,10 +144,21 @@ class LoginPage extends StatelessWidget {
             ),
           ),
 
-          // Ô nhập Password
+
           Positioned(
-            left: screenWidth * 0.1,
-            top: screenHeight * 0.63,
+            left: widthScale * 36,
+            top: heightScale * 509,
+            child: const Text(
+              "Password",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+              ),
+            ),
+          ),
+          Positioned(
+            left: widthScale * 36,
+            top: heightScale * 540,
             child: Container(
               width: screenWidth * 0.85,
               height: 50,
@@ -131,10 +181,10 @@ class LoginPage extends StatelessWidget {
             ),
           ),
 
-          // Nút LOGIN
+
           Positioned(
-            left: screenWidth * 0.17,
-            top: screenHeight * 0.72,
+            left: widthScale * 58,
+            top: heightScale * 619,
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -151,7 +201,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 child: const Center(
                   child: Text(
-                    "LOGIN",
+                    "REGISTER",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -163,26 +213,14 @@ class LoginPage extends StatelessWidget {
             ),
           ),
 
-          // Chữ OR
+
           Positioned(
-            left: screenWidth * 0.48,
-            top: screenHeight * 0.8,
-            child: const Text(
-              "OR",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          Positioned(
-            left: screenWidth * 0.24,
-            top: screenHeight * 0.83,
+            left: widthScale * 113,
+            top: heightScale * 817,
             child: Row(
               children: [
                 const Text(
-                  "Don't have an account?",
+                  "Have an account?",
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 16,
@@ -192,11 +230,11 @@ class LoginPage extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context)=> RegisterPage()),
+                      MaterialPageRoute(builder: (context)=> LoginPage()),
                     );
                   },
                   child: Text(
-                    "Sign Up",
+                    "Login",
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 16,

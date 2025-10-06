@@ -5,6 +5,10 @@ class Bedroom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    double widthScale = screenWidth / 412;
+    double heightScale = screenHeight / 917; 
     bool switchValueLED1 = false;
     bool switchValueLED2 = false;
     bool switchValueFan = false;
@@ -14,8 +18,8 @@ class Bedroom extends StatelessWidget {
         children: [
           // Nút Back 
           Positioned(
-            left: 18,
-            top: 23,
+            left: widthScale *18,
+            top: heightScale * 23,
             child: SizedBox(
               width: 48,
               height: 48,
@@ -34,7 +38,7 @@ class Bedroom extends StatelessWidget {
 
           // Bedroom 
           Positioned(
-            top: 44,
+            top: heightScale * 44,
             left: (MediaQuery.of(context).size.width - 243) / 2,
             child: Container(
               width: 243,
@@ -57,9 +61,9 @@ class Bedroom extends StatelessWidget {
           ),
 
           // Text Devices
-          const Positioned(
-            left: 37,
-            top: 130,
+          Positioned(
+            left: widthScale* 37,
+            top: heightScale * 130,
             child: Text(
               "Devices",
               style: TextStyle(
@@ -69,10 +73,11 @@ class Bedroom extends StatelessWidget {
               ),
             ),
           ),
+          
           //LED 1
           Positioned(
-            left: 25,
-            top: 171,
+            left: widthScale*25,
+            top: heightScale*171,
             child: StatefulBuilder(
               builder: (context, setState) {
                 return Container(
@@ -150,8 +155,8 @@ class Bedroom extends StatelessWidget {
 
           // LED 2 
           Positioned(
-            left: 207,
-            top: 171,
+            left: widthScale*207,
+            top: heightScale*171,
             child: StatefulBuilder(
               builder: (context, setState) {
                 return Container(
@@ -226,10 +231,11 @@ class Bedroom extends StatelessWidget {
               },
             ),
           ),
+          
           // FanFan
           Positioned(
-            left: 28,
-            top: 370,
+            left: widthScale*28,
+            top: heightScale*390,
             child: StatefulBuilder(
               builder: (context, setState) {
                 return Container(
@@ -306,8 +312,8 @@ class Bedroom extends StatelessWidget {
           ),
           // airair
           Positioned(
-            left: 207,
-            top: 370,
+            left: widthScale*207,
+            top: heightScale*390,
             child: StatefulBuilder(
               builder: (context, setState) {
                 return Container(
@@ -383,9 +389,9 @@ class Bedroom extends StatelessWidget {
             ),
           ),
           // Sensors
-          const Positioned(
-            left: 37,
-            top: 580,
+          Positioned(
+            left: widthScale*37,
+            top: heightScale*600,
             child: Text(
               "Sensors",
               style: TextStyle(
@@ -397,8 +403,8 @@ class Bedroom extends StatelessWidget {
           ),
           // Temp
           Positioned(
-            left: 32,
-            top: 620,
+            left: widthScale*32,
+            top: heightScale*640,
             child: Container(
               width: 343,
               height: 101,
@@ -461,10 +467,11 @@ class Bedroom extends StatelessWidget {
               ),
             ),
           ),
+         
          //humhum
           Positioned(
-            left: 32,
-            top: 730,
+            left: widthScale*32,
+            top: heightScale*760,
             child: Container(
               width: 343,
               height: 101,
