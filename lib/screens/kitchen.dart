@@ -1,45 +1,75 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
-class KitChen extends StatelessWidget {
+class KitChen extends StatefulWidget {
   const KitChen({super.key});
+
+  @override
+  State<KitChen> createState() => _KitChenState();
+}
+
+class _KitChenState extends State<KitChen> {
+  late DatabaseReference dbRef;
+
+  // Biến trạng thái
+  bool led1 = false;
+  bool led2 = false;
+  bool fan = false;
+  bool air = false;
+  int temp = 0;
+  int hum = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    dbRef = FirebaseDatabase.instance.ref("kitchen");
+    // Lắng nghe dữ liệu Firebase Realtime Database
+    dbRef.onValue.listen((event) {
+      final data = event.snapshot.value as Map<dynamic, dynamic>?;
+
+      if (data != null) {
+        setState(() {
+          led1 = data['led1'] as bool? ?? false;
+          led2 = data['led2'] as bool? ?? false;
+          fan = data['fan'] as bool? ?? false;
+          air = data['air'] as bool? ?? false;
+          temp = (data['temp'] as num?)?.toInt() ?? 0;
+          hum = (data['hum'] as num?)?.toInt() ?? 0;
+        });
+      }
+    });
+  }
+
+  // Hàm cập nhật bool lên Firebase
+  void updateBool(String key, bool value) {
+    dbRef.child(key).set(value);
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     double widthScale = screenWidth / 412;
-    double heightScale = screenHeight / 917; 
-    bool switchValueLED1 = false;
-    bool switchValueLED2 = false;
-    bool switchValueFan = false;
-    bool switchValueAir = false;
+    double heightScale = screenHeight / 917;
+
     return Scaffold(
       body: Stack(
         children: [
-          // Nút Back 
+          // Nút Back
           Positioned(
-            left: widthScale *18,
+            left: widthScale * 18,
             top: heightScale * 23,
-            child: SizedBox(
-              width: 48,
-              height: 48,
-              child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  size: 28,
-                  color: Colors.black,
-                ),
-                onPressed: () {
-                  Navigator.pop(context); // Quay lại HomePage
-                },
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, size: 28, color: Colors.black),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
 
-          // KitChen 
+          // Tiêu đề KitChen
           Positioned(
             top: heightScale * 44,
-            left: (MediaQuery.of(context).size.width - 243) / 2,
+            left: (screenWidth - 243) / 2,
             child: Container(
               width: 243,
               height: 41,
@@ -52,488 +82,230 @@ class KitChen extends StatelessWidget {
               child: const Text(
                 "KitChen",
                 style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                    color: Colors.black,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold),
               ),
             ),
           ),
 
-          // Text Devices
+          // Label "Devices"
           Positioned(
-            left: widthScale* 37,
+            left: widthScale * 37,
             top: heightScale * 130,
-            child: Text(
+            child: const Text(
               "Devices",
               style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
             ),
           ),
-          
-          //LED 1
+
+          // Widget LED1
           Positioned(
-            left: widthScale*25,
-            top: heightScale*171,
-            child: StatefulBuilder(
-              builder: (context, setState) {
-                return Container(
-                  width: 167,
-                  height: 183,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFAF8D3),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.black, width: 2),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 39,
-                        top: 12,
-                        child: Container(
-                          width: 92,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.black, width: 2),
-                          ),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            "LED 1",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Hình ảnh đổi theo switch
-                      Positioned(
-                        left: 41,
-                        top: 48,
-                        child: SizedBox(
-                          width: 88,
-                          height: 88,
-                          child: Image.asset(
-                            switchValueLED1
-                                ? 'assets/images/led.png'
-                                : 'assets/images/led_off.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-
-                      // Switch
-                      Positioned(
-                        left: 53,
-                        top: 144,
-                        child: SizedBox(
-                          width: 67,
-                          height: 32,
-                          child: Switch(
-                            value: switchValueLED1,
-                            onChanged: (val) {
-                              setState(() {
-                                switchValueLED1 = val;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+            left: widthScale * 25,
+            top: heightScale * 171,
+            child: buildDeviceCard(
+              title: "LED 1",
+              imageOn: "assets/images/led.png",
+              imageOff: "assets/images/led_off.png",
+              value: led1,
+              color: const Color(0xFFFAF8D3),
+              onChanged: (val) {
+                setState(() => led1 = val);
+                updateBool("led1", val);
               },
             ),
           ),
 
-          // LED 2 
+          // Widget LED2
           Positioned(
-            left: widthScale*207,
-            top: heightScale*171,
-            child: StatefulBuilder(
-              builder: (context, setState) {
-                return Container(
-                  width: 167,
-                  height: 183,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFDCFFBD),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.black, width: 2),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 39,
-                        top: 12,
-                        child: Container(
-                          width: 92,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.black, width: 2),
-                          ),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            "LED 2",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Hình ảnh đổi theo switch
-                      Positioned(
-                        left: 41,
-                        top: 48,
-                        child: SizedBox(
-                          width: 88,
-                          height: 88,
-                          child: Image.asset(
-                            switchValueLED2
-                                ? 'assets/images/led.png'
-                                : 'assets/images/led_off.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-
-                      // Switch
-                      Positioned(
-                        left: 53,
-                        top: 144,
-                        child: SizedBox(
-                          width: 67,
-                          height: 32,
-                          child: Switch(
-                            value: switchValueLED2,
-                            onChanged: (val) {
-                              setState(() {
-                                switchValueLED2 = val;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+            left: widthScale * 207,
+            top: heightScale * 171,
+            child: buildDeviceCard(
+              title: "LED 2",
+              imageOn: "assets/images/led.png",
+              imageOff: "assets/images/led_off.png",
+              value: led2,
+              color: const Color(0xFFDCFFBD),
+              onChanged: (val) {
+                setState(() => led2 = val);
+                updateBool("led2", val);
               },
             ),
           ),
-          
-          // FanFan
+
+          // Widget Fan
           Positioned(
-            left: widthScale*28,
-            top: heightScale*390,
-            child: StatefulBuilder(
-              builder: (context, setState) {
-                return Container(
-                  width: 164,
-                  height: 181,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFC5FFDD),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.black, width: 2),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 37,
-                        top: 12,
-                        child: Container(
-                          width: 90,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.black, width: 2),
-                          ),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            "Fan",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Hình ảnh đổi theo switch
-                      Positioned(
-                        left: 38,
-                        top: 50,
-                        child: SizedBox(
-                          width: 88,
-                          height: 88,
-                          child: Image.asset(
-                            switchValueFan
-                                ? 'assets/images/fan.png'
-                                : 'assets/images/fan_off.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-
-                      // Switch
-                      Positioned(
-                        left: 48,
-                        top: 145,
-                        child: SizedBox(
-                          width: 67,
-                          height: 32,
-                          child: Switch(
-                            value: switchValueFan,
-                            onChanged: (val) {
-                              setState(() {
-                                switchValueFan = val;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+            left: widthScale * 28,
+            top: heightScale * 390,
+            child: buildDeviceCard(
+              title: "Fan",
+              imageOn: "assets/images/fan.png",
+              imageOff: "assets/images/fan_off.png",
+              value: fan,
+              color: const Color(0xFFC5FFDD),
+              onChanged: (val) {
+                setState(() => fan = val);
+                updateBool("fan", val);
               },
             ),
           ),
-          // airair
+
+          // Widget Air
           Positioned(
-            left: widthScale*207,
-            top: heightScale*390,
-            child: StatefulBuilder(
-              builder: (context, setState) {
-                return Container(
-                  width: 164,
-                  height: 181,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFC2EEF7),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.black, width: 2),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 37,
-                        top: 12,
-                        child: Container(
-                          width: 90,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.black, width: 2),
-                          ),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            "Air",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Hình ảnh đổi theo switch
-                      Positioned(
-                        left: 38,
-                        top: 50,
-                        child: SizedBox(
-                          width: 88,
-                          height: 88,
-                          child: Image.asset(
-                            switchValueAir
-                                ? 'assets/images/air.png'
-                                : 'assets/images/air_off.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-
-                      // Switch
-                      Positioned(
-                        left: 48,
-                        top: 145,
-                        child: SizedBox(
-                          width: 67,
-                          height: 32,
-                          child: Switch(
-                            value: switchValueAir,
-                            onChanged: (val) {
-                              setState(() {
-                                switchValueAir = val;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+            left: widthScale * 207,
+            top: heightScale * 390,
+            child: buildDeviceCard(
+              title: "Air",
+              imageOn: "assets/images/air.png",
+              imageOff: "assets/images/air_off.png",
+              value: air,
+              color: const Color(0xFFC2EEF7),
+              onChanged: (val) {
+                setState(() => air = val);
+                updateBool("air", val);
               },
             ),
           ),
-          // Sensors
+
+          // Label "Sensors"
           Positioned(
-            left: widthScale*37,
-            top: heightScale*600,
-            child: Text(
+            left: widthScale * 37,
+            top: heightScale * 600,
+            child: const Text(
               "Sensors",
               style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+          ),
+
+          // Sensor Temp
+          Positioned(
+            left: widthScale * 32,
+            top: heightScale * 640,
+            child: buildSensorCard(
+              title: "Temp",
+              value: "$temp °C",
+              imagePath: "assets/images/temp.png",
+              color: const Color(0xFFFFB9B9),
+            ),
+          ),
+
+          // Sensor Hum
+          Positioned(
+            left: widthScale * 32,
+            top: heightScale * 760,
+            child: buildSensorCard(
+              title: "Hum",
+              value: "$hum %",
+              imagePath: "assets/images/hum.png",
+              color: const Color(0xFFA1BCFF),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget thiết bị
+  Widget buildDeviceCard({
+    required String title,
+    required String imageOn,
+    required String imageOff,
+    required bool value,
+    required Color color,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Container(
+      width: 167,
+      height: 183,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.black, width: 2),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 92,
+            height: 30,
+            decoration: BoxDecoration(
+              color: Colors.orange,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.black, width: 2),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              title,
+              style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Image.asset(
+            value ? imageOn : imageOff,
+            width: 88,
+            height: 88,
+          ),
+          Switch(value: value, onChanged: onChanged),
+        ],
+      ),
+    );
+  }
+
+  // Widget sensor
+  Widget buildSensorCard({
+    required String title,
+    required String value,
+    required String imagePath,
+    required Color color,
+  }) {
+    return Container(
+      width: 343,
+      height: 101,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.black, width: 2),
+      ),
+      child: Row(
+        children: [
+          const SizedBox(width: 30),
+          Text(
+            title,
+            style: const TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+                color: Colors.black),
+          ),
+          const SizedBox(width: 20),
+          Image.asset(imagePath, width: 45, height: 45),
+          const Spacer(),
+          Container(
+            width: 100,
+            height: 60,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFCFFCD),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.black, width: 2),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              value,
+              style: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
             ),
           ),
-          // Temp
-          Positioned(
-            left: widthScale*32,
-            top: heightScale*640,
-            child: Container(
-              width: 343,
-              height: 101,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFB9B9),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.black, width: 2),
-              ),
-              child: Stack(
-                children: [
-                  const Positioned(
-                    left: 40,
-                    top: 28,
-                    child: Text(
-                      "Temp",
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  
-                  Positioned(
-                    left: 120,
-                    top: 28,
-                    child: SizedBox(
-                      width: 45,
-                      height: 45,
-                      child: Image.asset(
-                        'assets/images/temp.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-
-                  Positioned(
-                    left: 180,
-                    top: 12,
-                    child: Container(
-                      width: 149,
-                      height: 76,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFCFFCD),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.black, width: 2),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        "30 °C",
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-         
-         //humhum
-          Positioned(
-            left: widthScale*32,
-            top: heightScale*760,
-            child: Container(
-              width: 343,
-              height: 101,
-              decoration: BoxDecoration(
-                color: const Color(0xFFA1BCFF),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.black, width: 2),
-              ),
-              child: Stack(
-                children: [
-                  const Positioned(
-                    left: 40,
-                    top: 28,
-                    child: Text(
-                      "Hum",
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  
-                  Positioned(
-                    left: 120,
-                    top: 28,
-                    child: SizedBox(
-                      width: 45,
-                      height: 45,
-                      child: Image.asset(
-                        'assets/images/hum.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-
-                  Positioned(
-                    left: 180,
-                    top: 12,
-                    child: Container(
-                      width: 149,
-                      height: 76,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFBFF1F3),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.black, width: 2),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        "30 %",
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          const SizedBox(width: 20),
         ],
       ),
     );

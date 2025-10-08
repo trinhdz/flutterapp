@@ -1,10 +1,53 @@
 import 'package:cuoiki/screens/registerpage.dart';
 import 'package:flutter/material.dart';
 import 'package:cuoiki/screens/homepage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatelessWidget {
+
+
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  Future<void> login() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final savedEmail = prefs.getString('email');
+    final savePassword = prefs.getString('password');
+
+    final inputEmail = emailController.text.trim();
+    final inputPassword = passwordController.text.trim();
+
+    if(inputEmail.isEmpty || inputPassword.isEmpty){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('vui long dien du thong tin'),)
+      );
+      return;
+    }
+
+    if(inputEmail == savedEmail && inputPassword == savePassword){
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('dang nhap thanh cong'),)
+      );
+
+      Navigator.pushReplacement(context, 
+      MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sai email or password'),)
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -91,10 +134,11 @@ class LoginPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
                 color: const Color(0xFFF2F0F0),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: TextField(
-                  decoration: InputDecoration(
+                  controller: emailController,
+                  decoration: const InputDecoration(
                     hintText: "Email",
                     prefixIcon: Icon(Icons.email),
                     border: InputBorder.none,
@@ -116,11 +160,12 @@ class LoginPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
                 color: const Color(0xFFF2F0F0),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: TextField(
+                  controller: passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "Password",
                     prefixIcon: Icon(Icons.lock),
                     border: InputBorder.none,
@@ -136,12 +181,7 @@ class LoginPage extends StatelessWidget {
             left: screenWidth * 0.17,
             top: screenHeight * 0.72,
             child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomePage()),
-                );
-              },
+              onTap: login,
               child: Container(
                 width: screenWidth * 0.7,
                 height: 58,

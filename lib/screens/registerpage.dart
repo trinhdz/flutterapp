@@ -1,6 +1,7 @@
-import 'package:cuoiki/screens/homepage.dart';
 import 'package:cuoiki/screens/loginpage.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -10,6 +11,45 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _saveUserData() async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('username', _usernameController.text);
+    await prefs.setString('email', _emailController.text);
+    await prefs.setString('password', _passwordController.text);
+  }
+
+  bool _validateInputs(){
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if(username.isEmpty || email.isEmpty || password.isEmpty){
+      _showMessage('vui long dien du thong tin');
+      return false;
+    }
+    if(!email.contains('@')){
+      _showMessage('email phai co @');
+      return false;
+    }
+    if(password.length < 6){
+      _showMessage('mat khau phai co 6 ki tu');
+      return false;
+    }
+    return true;
+  }
+
+  void _showMessage(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 2),)
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -94,10 +134,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 borderRadius: BorderRadius.circular(15),
                 color: const Color(0xFFF2F0F0),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: TextField(
-                  decoration: InputDecoration(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
                     hintText: "Username",
                     prefixIcon: Icon(Icons.person),
                     border: InputBorder.none,
@@ -129,11 +170,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 borderRadius: BorderRadius.circular(15),
                 color: const Color(0xFFF2F0F0),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: TextField(
-                  obscureText: true,
-                  decoration: InputDecoration(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
                     hintText: "Email",
                     prefixIcon: Icon(Icons.email),
                     border: InputBorder.none,
@@ -166,11 +207,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 borderRadius: BorderRadius.circular(15),
                 color: const Color(0xFFF2F0F0),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: TextField(
                   obscureText: true,
-                  decoration: InputDecoration(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(
                     hintText: "Password",
                     prefixIcon: Icon(Icons.lock),
                     border: InputBorder.none,
@@ -186,11 +228,17 @@ class _RegisterPageState extends State<RegisterPage> {
             left: widthScale * 58,
             top: heightScale * 619,
             child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomePage()),
+              onTap: () async {
+                if(_validateInputs()){
+                  await _saveUserData();
+                  _showMessage('dang ki thanh cong');
+                  Future.delayed(const Duration(seconds: 1),(){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginPage()),
                 );
+                  });
+                }
               },
               child: Container(
                 width: screenWidth * 0.7,

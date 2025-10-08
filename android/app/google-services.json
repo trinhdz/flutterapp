@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1090280450273",
+    "project_id": "fir-app-2e7c6",
+    "storage_bucket": "fir-app-2e7c6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1090280450273:android:83bc663e79670791722fa0",
+        "android_client_info": {
+          "package_name": "com.example.cuoiki"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATTboJAw42CBj0xcHam7N5qZHyNpOJxBo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
